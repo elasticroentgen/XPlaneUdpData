@@ -6,32 +6,13 @@ using System.Net.Sockets;
 
 namespace XPlaneUdpData.Core
 {
-    public class XPDataRefEventArgs : EventArgs
-    {
-        public List<XPDataRef> DataRefs { get; set; }
-    }
-
     public class XPlaneData
     {
-        private class UdpState : Object
-        {
-            public UdpState(IPEndPoint e, UdpClient c) { this.e = e; this.c = c; }
-            public IPEndPoint e;
-            public UdpClient c;
-        }
-
+        List<XPDataRef> _dataRefs = new List<XPDataRef>();
         private UdpClient _udpClient;
         private IPEndPoint _localEP;
         private IPEndPoint _remoteEP;
         private IAsyncResult _currentAsyncResult = null;
-
-        private List<XPDataRef> _dataRefs = new List<XPDataRef>();
-        public List<XPDataRef> DataRefs
-        {
-            get { return _dataRefs; }
-        }
-
-        public event EventHandler<XPDataRefEventArgs> OnDataRefUpdate = null;
 
         public XPlaneData()
         { }
@@ -59,14 +40,9 @@ namespace XPlaneUdpData.Core
 
                     XPDataRefStream stream = XPDataRefStream.ReadFromArray(buffer);
 
-                    if (stream != null)
+                    foreach (XPDataRefResult dataref in stream.DataRefs)
                     {
-                        foreach (XPDataRefResult dataref in stream.DataRefs)
-                        {
-                            _dataRefs[dataref.dref_en - 1].Result = dataref;
-                        }
-
-                        DataRefUpdate(this, new XPDataRefEventArgs());
+                        _dataRefs[dataref.dref_en - 1].Result = dataref;
                     }
                 }
                 catch (Exception ex)
@@ -136,10 +112,11 @@ namespace XPlaneUdpData.Core
             return dataStream.ToArray();
         }
 
-        protected void DataRefUpdate(object sender, XPDataRefEventArgs e)
+        private class UdpState : Object
         {
-            if (OnDataRefUpdate != null)
-                OnDataRefUpdate(this, new XPDataRefEventArgs { DataRefs = _dataRefs });
+            public UdpState(IPEndPoint e, UdpClient c) { this.e = e; this.c = c; }
+            public IPEndPoint e;
+            public UdpClient c;
         }
     }
 }
