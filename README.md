@@ -4,8 +4,8 @@ XPlaneUdpData
 XPlaneUdpData allows quick and easy access to XPlane UDP packets. With the release of
 XPlane 10.40, all datarefs can now be accessed via UDP.
 
-Disclaimer
-----------
+## Disclaimer
+
 Be aware that this is my first C# .NET project that is publically available. I will
 accept all feedback provided be it positive or negative. Learning curve expected.
 
@@ -14,11 +14,10 @@ accept all feedback provided be it positive or negative. Learning curve expected
 XPlaneUdpData is available on NuGet.
 
 ```
-Install-Package Octokit
+Install-Package XPlaneUdpData
 ```
 
-Usage Example
--------------
+## Usage Example
 
 ```c#
 using System;
