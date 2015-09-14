@@ -8,38 +8,49 @@ Usage Example
 -------------
 
 ```c#
-// Include the appropriate reference
+using System;
 using XPlaneUdpData.Core;
 
-// Initialize the XPlaneData object
-XPlaneData xpData = new XPlaneData("127.0.0.1", 49000);
-
-// Create the required callbacks
-void UpdateLat(XPDataRefResult e)
+namespace ConsoleApplication1
 {
-    Dispatcher.Invoke(() =>
+    class Program
     {
-        Console.WriteLine($"Latitude = {e.dref_flt}");
-    });
+        // UpdateLat callback
+        static void UpdateLat(XPDataRefResult e)
+        {
+            Console.WriteLine($"Latitude = {e.dref_flt}");
+        }
+
+        // UpdateLong callback
+        static void UpdateLong(XPDataRefResult e)
+        {
+            Console.WriteLine($"Longitude = {e.dref_flt}");
+        }
+
+        static void Main(string[] args)
+        {
+            // Initialize the XPlaneData object
+            XPlaneData xpData = new XPlaneData("127.0.0.1", 49000);
+
+            // Add the requested datarefs
+            xpData.AddDataRef("sim/flightmodel/position/latitude", 1, UpdateLat);
+            xpData.AddDataRef("sim/flightmodel/position/longitude", 1, UpdateLong);
+
+            // Start sending UDP packets
+            xpData.StartPolling();
+
+            // Wait for ESC key to stop
+            Console.WriteLine("Press ESC to stop");
+            do
+            {
+                while (!Console.KeyAvailable)
+                {
+                }
+            } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
+
+            // Stop sending UDP packets
+            xpData.StopPolling();
+        }
+    }
 }
-
-void UpdateLong(XPDataRefResult e)
-{
-    Dispatcher.Invoke(() =>
-    {
-        Console.WriteLine($"Longitude = {e.dref_flt}");
-    });
-}
-
-// Add the requested datarefs
-xpData.AddDataRef("sim/flightmodel/position/latitude", 1, UpdateLat);
-xpData.AddDataRef("sim/flightmodel/position/longitude", 1, UpdateLong);
-
-// Start sending UDP packets
-xpData.StartPolling();
-
-...
-
-// Stop sending UDP packets
-xpData.StopPolling();
 ```
