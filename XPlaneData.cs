@@ -11,7 +11,7 @@ namespace XPlaneUdpData.Core
         List<XPDataRef> _dataRefs = new List<XPDataRef>();
         private UdpClient _udpClient;
         private IPEndPoint _localEP;
-        private IPEndPoint _remoteEP;// = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 49000);
+        private IPEndPoint _remoteEP;
         private IAsyncResult _currentAsyncResult = null;
 
         public XPlaneData()
