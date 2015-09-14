@@ -9,6 +9,14 @@ Disclaimer
 Be aware that this is my first C# .NET project that is publically available. I will
 accept all feedback provided be it positive or negative. Learning curve expected.
 
+## Getting Started
+
+XPlaneUdpData is available on NuGet.
+
+```
+Install-Package Octokit
+```
+
 Usage Example
 -------------
 
