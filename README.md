@@ -14,24 +14,32 @@ using XPlaneUdpData.Core;
 // Initialize the XPlaneData object
 XPlaneData xpData = new XPlaneData("127.0.0.1", 49000);
 
-# Check that the job is listed
-$ helios jobs
+// Create the required callbacks
+void UpdateLat(XPDataRefResult e)
+{
+    Dispatcher.Invoke(() =>
+    {
+        Console.WriteLine($"Latitude = {e.dref_flt}");
+    });
+}
 
-# List helios hosts
-$ helios hosts
+void UpdateLong(XPDataRefResult e)
+{
+    Dispatcher.Invoke(() =>
+    {
+        Console.WriteLine($"Longitude = {e.dref_flt}");
+    });
+}
 
-# Deploy the nginx job on one of the hosts
-$ helios deploy nginx:v1 <host>
+// Add the requested datarefs
+xpData.AddDataRef("sim/flightmodel/position/latitude", 1, UpdateLat);
+xpData.AddDataRef("sim/flightmodel/position/longitude", 1, UpdateLong);
 
-# Check the job status
-$ helios status
+// Start sending UDP packets
+xpData.StartPolling();
 
-# Curl the nginx container when it's started running
-$ curl <host>:8080
+...
 
-# Undeploy the nginx job
-$ helios undeploy -a nginx:v1
-
-# Remove the nginx job
-$ helios remove nginx:v1
+// Stop sending UDP packets
+xpData.StopPolling();
 ```
