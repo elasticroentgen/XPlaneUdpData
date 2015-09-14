@@ -8,8 +8,11 @@ Usage Example
 -------------
 
 ```c#
-# Create an nginx job using the nginx container image, exposing it on the host on port 8080
-$ helios create nginx:v1 nginx:1.7.1 -p http=80:8080
+// Include the appropriate reference
+using XPlaneUdpData.Core;
+
+// Initialize the XPlaneData object
+XPlaneData xpData = new XPlaneData("127.0.0.1", 49000);
 
 # Check that the job is listed
 $ helios jobs
