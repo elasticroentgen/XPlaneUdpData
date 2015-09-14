@@ -6,13 +6,32 @@ using System.Net.Sockets;
 
 namespace XPlaneUdpData.Core
 {
+    public class XPDataRefEventArgs : EventArgs
+    {
+        public List<XPDataRef> DataRefs { get; set; }
+    }
+
     public class XPlaneData
     {
-        List<XPDataRef> _dataRefs = new List<XPDataRef>();
+        private class UdpState : Object
+        {
+            public UdpState(IPEndPoint e, UdpClient c) { this.e = e; this.c = c; }
+            public IPEndPoint e;
+            public UdpClient c;
+        }
+
         private UdpClient _udpClient;
         private IPEndPoint _localEP;
         private IPEndPoint _remoteEP;
         private IAsyncResult _currentAsyncResult = null;
+
+        private List<XPDataRef> _dataRefs = new List<XPDataRef>();
+        public List<XPDataRef> DataRefs
+        {
+            get { return _dataRefs; }
+        }
+
+        public event EventHandler<XPDataRefEventArgs> OnDataRefUpdate = null;
 
         public XPlaneData()
         { }
@@ -40,9 +59,14 @@ namespace XPlaneUdpData.Core
 
                     XPDataRefStream stream = XPDataRefStream.ReadFromArray(buffer);
 
-                    foreach (XPDataRefResult dataref in stream.DataRefs)
+                    if (stream != null)
                     {
-                        _dataRefs[dataref.dref_en - 1].Result = dataref;
+                        foreach (XPDataRefResult dataref in stream.DataRefs)
+                        {
+                            _dataRefs[dataref.dref_en - 1].Result = dataref;
+                        }
+
+                        DataRefUpdate(this, new XPDataRefEventArgs());
                     }
                 }
                 catch (Exception ex)
@@ -112,11 +136,10 @@ namespace XPlaneUdpData.Core
             return dataStream.ToArray();
         }
 
-        private class UdpState : Object
+        protected void DataRefUpdate(object sender, XPDataRefEventArgs e)
         {
-            public UdpState(IPEndPoint e, UdpClient c) { this.e = e; this.c = c; }
-            public IPEndPoint e;
-            public UdpClient c;
+            if (OnDataRefUpdate != null)
+                OnDataRefUpdate(this, new XPDataRefEventArgs { DataRefs = _dataRefs });
         }
     }
 }
